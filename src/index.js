@@ -22,7 +22,7 @@ app.use(cookieParser())
 app.use(session({
     
     store: MongoStore.create({
-        mongoUrl: "mongodb+srv://franciscopugh01:9@cluster0.w0js7.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
+        mongoUrl: "",
         mongoOptions: {},
         ttl: 15
     }),
@@ -31,7 +31,7 @@ app.use(session({
     saveUninitialized: true
 }))
 
-mongoose.connect("mongodb+srv://franciscopugh01:@cluster0.w0js7.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
+mongoose.connect()
 .then(() => console.log("DB is connected"))
 .catch((e) => console.log("Error al conectarme a DB:", e))
 
@@ -40,10 +40,10 @@ app.use(passport.initialize())
 app.use(passport.session())
 app.engine('handlebars', hbs.engine)
 app.set('view engine', 'handlebars')
-app.set('views', path.join(__dirname, 'views')) //Concateno evitando erroes de / o \
+app.set('views', path.join(__dirname, 'views')) 
 
 //Rutas
-app.use('/public', express.static(__dirname + '/public')) //Concateno rutas
+app.use('/public', express.static(__dirname + '/public')) 
 app.use('/api/sessions', sessionRouter)
 app.use('/api/products', productRouter)
 app.use('/api/carts', cartRouter)
