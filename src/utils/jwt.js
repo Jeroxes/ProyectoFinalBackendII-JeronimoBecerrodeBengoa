@@ -1,6 +1,5 @@
+import 'dotenv/config'
 import jwt from 'jsonwebtoken'
-
-let secretKey = "PokeSecret"
 
 export const generateToken = (user) => {
  

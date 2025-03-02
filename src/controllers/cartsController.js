@@ -1,4 +1,6 @@
 import cartModel from '../models/cart.js'
+import ticketModel from '../models/ticket.js'
+import productModel from '../models/product.js'
 
 export const getCart = async (req,res) => {
     try {
@@ -120,5 +122,62 @@ export const deleteCart = async (req,res) => {
         }
     }catch(e){
         res.status(500).render('templates/error', {e})
+    }
+}
+
+export const checkout = async(req,res) => {
+    try {
+        const cartId = req.params.cid
+        const cart = await cartModel.findById(cartId)
+        const prodStockNull = []
+        if(cart) {
+            //Ver si todos los productos tienen stock suficiente
+            for(const prod of cart.products) {
+                let producto = await productModel.findById(prod.id_prod)
+                if(producto.stock - prod.quantity < 0) {
+                    prodStockNull.push(producto.id)
+                }
+            }
+
+            if(prodStockNull.length === 0) {
+                
+                
+                let totalAmount = 0;
+    
+                for (const prod of cart.products) { 
+                    const producto = await productModel.findById(prod.id_prod);
+                    if (producto) {
+                        producto.stock -= prod.quantity;
+                        totalAmount += producto.price * prod.quantity;
+                        await producto.save();
+                    }
+                }
+            
+                const newTicket = await ticketModel.create({
+                    code: crypto.randomUUID(),
+                    purchaser: req.user.email,
+                    amount: totalAmount,
+                    products: cart.products
+                });
+
+                await cartModel.findByIdAndUpdate(cartId, { products: []})
+                res.status(200).send(newTicket)
+            } else {
+                
+                prodStockNull.forEach((prodId) => {
+                    let indice = cart.products.findIndex(prod => prod.id == prodId)
+                    cart.products.splice(indice,1)
+                    
+                })
+                await cartModel.findByIdAndUpdate(cartId, {
+                    products: cart.products
+                })
+                res.status(400).send(prodStockNull)
+            }
+        } else {
+            res.status(404).send({message: "Carrito no existe"})
+        }
+    } catch (e) {
+        res.status.send({message:e})
     }
 }

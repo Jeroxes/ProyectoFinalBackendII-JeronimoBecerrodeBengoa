@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import express from 'express'
 import path from 'path'
 import { __dirname } from './path.js'
@@ -41,16 +42,12 @@ app.use(passport.session())
 app.engine('handlebars', hbs.engine)
 app.set('view engine', 'handlebars')
 app.set('views', path.join(__dirname, 'views')) 
-
-//Rutas
 app.use('/public', express.static(__dirname + '/public')) 
 app.use('/api/sessions', sessionRouter)
 app.use('/api/products', productRouter)
 app.use('/api/carts', cartRouter)
+app.use('/', indexRouter)
 
-app.get('/', (req,res) => {
-    res.status(200).send("Hola desde Inicio")
-})
 app.listen(PORT, () => {
     console.log(`Server on port ${PORT}`)
 })

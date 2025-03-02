@@ -14,13 +14,12 @@ export const login = async (req,res) => {
         } 
         
         
-        res.cookie('coderCookie', token, {
+        res.status(200).cookie('coderCookie', token, {
             httpOnly: true,
             secure: false, 
             maxAge: 3600000 
-        })
+        }).send({message: "Usuario logueado correctamente"})
 
-        res.status(200).redirect('/')
     }catch(e) {
         console.log(e); 
         res.status(500).send("Error al loguear usuario")
@@ -29,24 +28,31 @@ export const login = async (req,res) => {
 
 export const register = async (req,res) => {
     try {
-        console.log(req.user);
         if(!req.user) { 
             return res.status(400).send("El mail ya se encuentra registrado")
         } 
-        return res.status(201).send("Usuario creado correctamente")
+        return res.status(201).send({message: "Usuario creado correctamente"})
     }catch(e) {
         console.log(e);
-        res.status(500).send("Error al registrar usuario")
+        res.status(500).send({message: "Error al registrar usuario"})
     }
     
 }
 
 export const viewRegister = (req,res) => {
-    res.status(200).render('templates/register', {})
+    res.status(200).render('templates/register', {
+        title: "Registro de Usuario",
+        url_js: "/js/register.js",
+        url_css: "/css/register.css"
+    })
 }
 
 export const viewLogin = (req,res) => {
-    res.status(200).render('templates/login', {})
+    res.status(200).render('templates/login', {
+        title: "Inicio de Sesion de Usuario",
+        url_js: "/js/login.js",
+        url_css: "/css/login.css"
+    })
 }
 
 export const githubLogin = (req,res) => {
@@ -55,7 +61,12 @@ export const githubLogin = (req,res) => {
             email: req.user.email,
             first_name: req.user.first_name
         } 
-        res.status(200).redirect("/")
+        const token = generateToken(req.user)
+        res.status(200).cookie('coderCookie', token, {
+            httpOnly: true,
+            secure: false, 
+            maxAge: 3600000 
+        }).redirect("/api/products")
     }catch(e) {
         console.log(e); 
         res.status(500).send("Error al loguear usuario")
