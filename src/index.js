@@ -22,7 +22,7 @@ app.use(cookieParser())
 app.use(session({
     
     store: MongoStore.create({
-        mongoUrl: "",
+        mongoUrl: "mongodb+srv://jeronimobdb:<db_password>@try1.rnsih.mongodb.net/",
         mongoOptions: {},
         ttl: 15
     }),
@@ -31,7 +31,7 @@ app.use(session({
     saveUninitialized: true
 }))
 
-mongoose.connect()
+mongoose.connect("mongodb+srv://jeronimobdb:<db_password>@try1.rnsih.mongodb.net/")
 .then(() => console.log("DB is connected"))
 .catch((e) => console.log("Error al conectarme a DB:", e))
 
